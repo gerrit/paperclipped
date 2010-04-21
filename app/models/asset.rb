@@ -184,6 +184,7 @@ class Asset < ActiveRecord::Base
   has_many :page_attachments, :dependent => :destroy
   has_many :pages, :through => :page_attachments
  
+  belongs_to :fallback, :class_name => 'Asset'
   belongs_to :created_by, :class_name => 'User'
   belongs_to :updated_by, :class_name => 'User'
   

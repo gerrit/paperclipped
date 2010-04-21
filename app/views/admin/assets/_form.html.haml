@@ -12,6 +12,12 @@
             %label{ :for => "asset_caption" } Caption
           %td.field
             = f.text_field :caption, :class => 'textbox', :maxlength => 255 
+        - if @asset && (@asset.swf? || @asset.video?)
+          %tr
+            %td.label
+              %label{ :for => "asset_caption" } Fallback Content ID
+            %td.field
+              = f.text_field :fallback_id, :class => 'textbox'
         = render_region :extended_metadata
     %p
       %small
