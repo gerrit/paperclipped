@@ -38,7 +38,7 @@ module AssetTags
   end
   
   desc %{
-    References the first asset attached to the current page.  
+    References the first asset attached to the current page.
     
     *Usage:* 
     <pre><code><r:assets:first>...</r:assets:first></code></pre>
@@ -47,6 +47,22 @@ module AssetTags
     attachments = tag.locals.page.page_attachments
     if first = attachments.first
       tag.locals.asset = first.asset
+      tag.expand
+    end
+  end
+  
+  desc %{
+    References the fallback asset associated with the current asset
+    Only works when current asset is a Video or a SWF File
+    Renders nothing when there is no fallback image
+    
+    *Usage:*
+    <pre><code><r:assets:flash id="123"><r:fallback><r:image /></r:fallback></r:assets:flash></code></pre>
+  }
+  tag 'assets:fallback' do |tag|
+    parent = tag.locals.asset
+    if parent.respond_to?(:fallback) && parent.fallback
+      tag.locals.asset = parent.fallback
       tag.expand
     end
   end
@@ -250,13 +266,15 @@ module AssetTags
     raise TagError, 'Must be flash' unless asset.swf?
     url = asset.thumbnail('original')
     dimensions = [(tag.attr['width'] || asset.width),(tag.attr['height'] || asset.height)]
-    swf_embed_markup url, dimensions, tag.expand
+    tag.locals.asset = asset
+    fallback = tag.expand
+    swf_embed_markup url, dimensions, fallback
   end
   
   tag 'assets:thumbnail' do |tag|
     asset, options = asset_and_options(tag)
     asset.generate_thumbnail('test', ['24x24#',nil])
-    asset.save    
+    asset.save
   end
   
   desc %{
